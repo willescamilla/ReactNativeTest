@@ -1,21 +1,50 @@
-import React, {useState} from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, FlatList, Button } from 'react-native';
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
 export default function App() {
-  const[outputText, setOutputText] = useState('Open up App.js to start working on your app!');
+  const [courseGoals, setCourseGoals] = useState([]);
+  const [isAddMode, setIsAddMode] = useState(false);
+
+  const addGoalHandler = (goalTitle) => {
+    setCourseGoals(currentGoals =>
+      [...currentGoals,
+      { key: Math.random().toString(), value: goalTitle }]);
+
+      setIsAddMode(false);
+  };
+
+  const removeGoalHandler = (goalId) => {
+    setCourseGoals(currentGoals => {
+      return currentGoals.filter((goal) => goal.key !== goalId);
+    });
+  };
+
+  const cancelGoalAdditionHandler = (goalId) => {
+      setIsAddMode(false);
+  };
+
   return (
-    <View style={styles.container}> 
-      <Text>{outputText}</Text>
-      <Button title= "Change Text" onPress = {() => setOutputText('The text has changed')}/>
+    <View style={styles.screen}>
+      <Button title='Add New Goal' onPress={() => setIsAddMode(true)}/>
+      <GoalInput visible={isAddMode} onAddGoal={addGoalHandler} onCancel={cancelGoalAdditionHandler}/>
+      <FlatList
+        data={courseGoals}
+        renderItem={itemData => 
+          <GoalItem
+            id={itemData.item.key}
+            onDelete={removeGoalHandler}
+            title={itemData.item.value}
+          />
+        }
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  screen: {
+    padding: 50
+  }
 });
