@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {connect} from 'react-redux';
+
+import {remGoal} from "../actions/index";
 
 const GoalItem = props => {
+    console.log(props);
     return (
-        <TouchableOpacity activeOpacity={.8} onPress={props.onDelete.bind(this, props.id)}>
+        <TouchableOpacity activeOpacity={.8} onPress={() => props.onDelete(props.id)}>
             <View style={styles.listItem}>
                 <Text>{props.title}</Text>
             </View>
@@ -21,4 +25,10 @@ const styles = StyleSheet.create({
     }
 });
 
-export default GoalItem;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onDelete: (id) => dispatch(remGoal(id))
+    }
+}
+
+export default connect(null, mapDispatchToProps)(GoalItem);

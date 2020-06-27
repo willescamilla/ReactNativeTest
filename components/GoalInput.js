@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Button, TextInput, Modal } from 'react-native';
+import {connect} from 'react-redux';
+
+import {addGoal} from "../actions/index";
 
 const GoalInput = props => {
     const [enteredGoal, setEnteredGoal] = useState('');
 
-    const goalInputHandler = (enteredText) => {
-        setEnteredGoal(enteredText);
-    };
-
-    const addGoalHandler = (enteredText) => {
-        props.onAddGoal(enteredGoal);
+    const addGoal = (enteredText) => {
+        if(enteredText.length === 0){
+            return;
+        }
+        props.addGoalHandler(enteredText);
         setEnteredGoal('');
+        props.close();
     };
 
     return (
@@ -19,15 +22,15 @@ const GoalInput = props => {
                 <TextInput
                     placeholder="Course Goal"
                     style={styles.input}
-                    onChangeText={goalInputHandler}
+                    onChangeText={setEnteredGoal}
                     value={enteredGoal}
                 />
                 <View style={styles.buttonContainer}>
                     <View style={styles.button}>
-                        <Button title='Cancel' color="red" onPress={props.onCancel} />
+                        <Button title='Cancel' color="red" onPress={props.close} />
                     </View>
                     <View style={styles.button}>
-                        <Button title="ADD" onPress={addGoalHandler} />
+                        <Button title="ADD" onPress={() => addGoal(enteredGoal)} />
                     </View>
                 </View>
             </View>
@@ -62,4 +65,11 @@ const styles = StyleSheet.create({
     }
 });
 
-export default GoalInput;
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addGoalHandler: (text) => dispatch(addGoal(text))
+    }
+}
+
+export default connect(null, mapDispatchToProps)(GoalInput);

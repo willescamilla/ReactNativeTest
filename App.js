@@ -1,58 +1,36 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, FlatList, Button } from 'react-native';
+import React from 'react';
+import { Provider} from 'react-redux';
+import { createStore } from 'redux';
 
-import GoalItem from './components/GoalItem';
-import GoalInput from './components/GoalInput';
+import GoalScreen from "./components/GoalScreen";
 
-export default function App() {
-  const [courseGoals, setCourseGoals] = useState([]);
-  const [isAddMode, setIsAddMode] = useState(false);
-
-  const addGoalHandler = (goalTitle) => {
-    if(goalTitle.length === 0){
-      return;
-    }
-    setCourseGoals(currentGoals =>
-      [...currentGoals,
-      { key: Math.random().toString(), value: goalTitle }]);
-
-    setIsAddMode(false);
-  };
-
-  const removeGoalHandler = (goalId) => {
-    setCourseGoals(currentGoals => {
-      return currentGoals.filter((goal) => goal.key !== goalId);
-    });
-  };
-
-  const cancelGoalAdditionHandler = (goalId) => {
-    setIsAddMode(false);
-  };
-
-  return (
-    <View style={styles.screen}>
-      <Button title='Add New Goal' onPress={() => setIsAddMode(true)} />
-      <GoalInput
-        visible={isAddMode}
-        onAddGoal={addGoalHandler}
-        onCancel={cancelGoalAdditionHandler}
-      />
-      <FlatList
-        data={courseGoals}
-        renderItem={itemData =>
-          <GoalItem
-            id={itemData.item.key}
-            onDelete={removeGoalHandler}
-            title={itemData.item.value}
-          />
-        }
-      />
-    </View>
-  );
+const initial_state = {
+  courseGoals: []
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    padding: 50
+const store = createStore(
+  (state = initial_state, {type, payload}) => {
+    switch (type) {
+      case "ADD_GOAL": {
+        console.log(payload)
+        return {
+          courseGoals: [...state.courseGoals, {key: payload.key.toString(), value: payload.text}]
+        }
+      }
+      case "REM_GOAL": {
+        return {
+         courseGoals: [...state.courseGoals].filter((goal) => goal.key != payload.id)
+        }
+      }
+      default: return state
+    }
   }
-});
+)
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <GoalScreen />
+    </Provider>
+  );
+}
